@@ -4,6 +4,7 @@ interface SliderProps {
   label: string;
   value: number;
   onChange: (value: number) => void;
+  fixedRate: number;
   width?: string; // Optional width prop
 }
 
