@@ -10,6 +10,7 @@ const Home: React.FC = () => {
   const [usdAssets, setUsdAssets] = useState<number>(1000); // Total assets in USD
   const [eurAssets, setEurAssets] = useState<number>(800); // Total assets in EUR
   const [hufAssets, setHufAssets] = useState<number>(0); // HUF assets
+  const [decoupleSliders, setDecoupleSliders] = useState<boolean>(false); // Toggle for decoupling sliders
 
   // Calculate remaining HUF after deducting HUF assets
   const remainingHuf = totalHuf - hufAssets;
@@ -18,22 +19,44 @@ const Home: React.FC = () => {
   const usdRate = (remainingHuf - eurValue * eurAssets) / usdAssets; // HUF per USD
   const eurRate = (remainingHuf - usdValue * usdAssets) / eurAssets; // HUF per EUR
 
-  // Function to update USD value and adjust EUR value
+  // Function to update USD value
   const updateUsdValue = (newUsdValue: number) => {
     const roundedUsdValue = parseFloat(newUsdValue.toFixed(2)); // Round to 2 decimal places
     setUsdValue(roundedUsdValue);
-    const remainingAfterUsd = remainingHuf - roundedUsdValue * usdAssets;
-    const newEurValue = parseFloat((remainingAfterUsd / eurAssets).toFixed(2)); // Round to 2 decimal places
-    setEurValue(newEurValue);
+
+    if (!decoupleSliders) {
+      // Couple Mode: Adjust EUR value to maintain the total
+      const remainingAfterUsd = remainingHuf - roundedUsdValue * usdAssets;
+      const newEurValue = parseFloat(
+        (remainingAfterUsd / eurAssets).toFixed(2)
+      ); // Round to 2 decimal places
+      setEurValue(newEurValue);
+    } else {
+      // Decouple Mode: Recalculate the total
+      const newTotalHuf =
+        roundedUsdValue * usdAssets + eurValue * eurAssets + hufAssets;
+      setTotalHuf(newTotalHuf);
+    }
   };
 
-  // Function to update EUR value and adjust USD value
+  // Function to update EUR value
   const updateEurValue = (newEurValue: number) => {
     const roundedEurValue = parseFloat(newEurValue.toFixed(2)); // Round to 2 decimal places
     setEurValue(roundedEurValue);
-    const remainingAfterEur = remainingHuf - roundedEurValue * eurAssets;
-    const newUsdValue = parseFloat((remainingAfterEur / usdAssets).toFixed(2)); // Round to 2 decimal places
-    setUsdValue(newUsdValue);
+
+    if (!decoupleSliders) {
+      // Couple Mode: Adjust USD value to maintain the total
+      const remainingAfterEur = remainingHuf - roundedEurValue * eurAssets;
+      const newUsdValue = parseFloat(
+        (remainingAfterEur / usdAssets).toFixed(2)
+      ); // Round to 2 decimal places
+      setUsdValue(newUsdValue);
+    } else {
+      // Decouple Mode: Recalculate the total
+      const newTotalHuf =
+        usdValue * usdAssets + roundedEurValue * eurAssets + hufAssets;
+      setTotalHuf(newTotalHuf);
+    }
   };
 
   return (
@@ -74,6 +97,16 @@ const Home: React.FC = () => {
           onChange={(e) => setEurAssets(parseFloat(e.target.value))}
           className="total-huf-input" // Apply the custom class
         />
+      </div>
+      <div style={{ padding: "15px 0" }}>
+        <label>
+          <input
+            type="checkbox"
+            checked={decoupleSliders}
+            onChange={(e) => setDecoupleSliders(e.target.checked)}
+          />
+          Decouple Sliders
+        </label>
       </div>
       <Slider
         label="USD"

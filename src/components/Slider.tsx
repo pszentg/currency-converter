@@ -5,6 +5,7 @@ interface SliderProps {
   value: number;
   onChange: (value: number) => void;
   fixedRate: number;
+  width?: string; // Optional width prop
 }
 
 const Slider: React.FC<SliderProps> = ({
@@ -12,9 +13,10 @@ const Slider: React.FC<SliderProps> = ({
   value,
   onChange,
   fixedRate,
+  width = "100%",
 }) => {
   return (
-    <div>
+    <div style={{ width, padding: "15px 0" }}>
       <label>{label}</label>
       <input
         type="range"
@@ -22,13 +24,19 @@ const Slider: React.FC<SliderProps> = ({
         max="500"
         value={value}
         onChange={(e) => onChange(parseFloat(e.target.value))}
+        style={{ width: "100%" }} // Make the slider full width
       />
       <input
         type="number"
-        value={value}
-        onChange={(e) => onChange(parseFloat(e.target.value))}
+        value={value.toFixed(2)} // Round to 2 decimal places
+        onChange={(e) => {
+          const roundedValue = parseFloat(
+            parseFloat(e.target.value).toFixed(2)
+          ); // Round input to 2 decimal places
+          onChange(roundedValue);
+        }}
+        style={{ width: "65px", marginLeft: "10px" }} // Wider input field
       />
-      <span> (Rate: {fixedRate.toFixed(2)})</span>
     </div>
   );
 };
