@@ -4,7 +4,6 @@ interface SliderProps {
   label: string;
   value: number;
   onChange: (value: number) => void;
-  fixedRate: number;
   width?: string; // Optional width prop
 }
 
@@ -12,7 +11,6 @@ const Slider: React.FC<SliderProps> = ({
   label,
   value,
   onChange,
-  fixedRate,
   width = "100%",
 }) => {
   return (
